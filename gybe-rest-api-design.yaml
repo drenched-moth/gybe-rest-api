@@ -1,15 +1,14 @@
-openapi: '3.1.0'
+openapi: '3.0.0'
 info:
   version: '0.1.0'
   title: 'gybe-rest-api'
   description: Rest API for all data related to godspeed you ! black emperor concerts and concerts recordings
   contact:
-    name: no contact
-    url: www.donotcontactme.com
-    email: please@donotcontact.me
+    name: Lucas Donati
+    email: lucas.donati@etu.unige.ch
 
 servers:
-  - url: localhost:8080/v1
+  - url: http://localhost:8080/v1
     description: local server
 
 tags:
@@ -19,7 +18,6 @@ tags:
   - name: Members
 
 paths:
-# concerts
   /concerts:
     get:
       summary: Get concerts
@@ -82,10 +80,6 @@ paths:
           description: Invalid query parameter
         '500':
           description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
   /concerts/{concert_id}:
     get:
       summary: Get a specific concert
@@ -110,11 +104,6 @@ paths:
           description: No concert found  for the provided 'concert_id'
         '500':
           description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-#songs
   /songs:
     get:
       summary: Get songs
@@ -164,7 +153,6 @@ paths:
                   $ref: '#/components/schemas/Song'
         '404':
           description: Song not found
-# Members
   /members:
     get:
       summary: Get all members
@@ -181,7 +169,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Member'
-# Recordings
   /recordings:
     get:
       summary: Get all recordings
@@ -377,7 +364,8 @@ components:
         id:
           type: integer
         date:
-          type: datetime
+          type: string
+          format: date
         venue:
           type: string
         city:
@@ -434,14 +422,6 @@ components:
         url:
           type: string
 
-    Error:
-      type: object
-      required:
-        - message
-      properties:
-        message:
-          description: A human readable error message
-          type: string
   securitySchemes:
     ApiKey:
       type: apiKey
