@@ -71,22 +71,22 @@ This project is a REST API implemented with Python-Flask, designed to manage and
 ### Concerts
 
 - **GET /concerts**: Retrieve a list of all concerts.
-- **GET /concerts/<id>**: Retrieve details of a specific concert.
+- **GET /concerts/\<id\>**: Retrieve details of a specific concert.
 - **POST /concerts**: Add a new concert.
-- **PUT /concerts/<id>**: Update a concert.
-- **DELETE /concerts/<id>**: Delete a concert.
+- **PUT /concerts/\<id\>**: Update a concert.
+- **DELETE /concerts/\<id\>**: Delete a concert.
 
 ### Setlists
 
-- **GET /concerts/<id>/setlist**: Retrieve the setlist of a specific concert.
+- **GET /concerts/\<id\>/setlist**: Retrieve the setlist of a specific concert.
 
 ### Band Composition
 
-- **GET /concerts/<id>/band**: Retrieve the band composition for a specific concert.
+- **GET /concerts/\<id\>/band**: Retrieve the band composition for a specific concert.
 
 ### Recordings
 
-- **GET /concerts/<id>/recordings**: Retrieve recordings of a specific concert.
+- **GET /concerts/\<id\>/recordings**: Retrieve recordings of a specific concert.
 
 
 ## Database Schema
