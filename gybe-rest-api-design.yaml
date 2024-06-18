@@ -16,6 +16,8 @@ tags:
   - name: Recordings
   - name: Songs
   - name: Members
+  - name: BandCompositions
+  - name: Setlists
 
 paths:
   /concerts:
@@ -559,7 +561,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Concert'
+                  $ref: '#/components/schemas/Recording'
         '404':
           description: No concert found for the provided 'concert_id'
     post:
@@ -602,7 +604,7 @@ paths:
       description: Get the band composition at a specific concert
       operationId: get_members_by_concert_id
       tags:
-        - Members
+        - BandCompositions
       parameters:
         - name: concert_id
           in: path
@@ -624,7 +626,7 @@ paths:
       description: Create the band composition for a concert
       operationId: insert_band_composition
       tags:
-        - Members
+        - BandCompositions
       parameters:
         - name: concert_id
           in: path
@@ -657,7 +659,7 @@ paths:
       description: Delete an existing band composition
       operationId: delete_band_composition
       tags:
-        - Members
+        - BandCompositions
       parameters:
         - name: concert_id
           in: path
@@ -679,7 +681,7 @@ paths:
       description: Get played songs at a specific concert
       operationId: get_songs_by_concert_id
       tags:
-        - Songs
+        - Setlists
       parameters:
         - name: concert_id
           in: path
@@ -700,7 +702,7 @@ paths:
       description: Create a setlist for a concert
       operationId: insert_setlist
       tags:
-        - Songs
+        - Setlists
       parameters:
         - name: concert_id
           in: path
@@ -733,7 +735,7 @@ paths:
       description: Update a setlist for a concert
       operationId: update_setlist
       tags:
-        - Songs
+        - Setlists
       parameters:
         - name: concert_id
           in: path
@@ -766,7 +768,7 @@ paths:
       description: Delete an existing setlist
       operationId: delete_setlist
       tags:
-        - Songs
+        - Setlists
       parameters:
         - name: concert_id
           in: path
