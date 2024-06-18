@@ -381,7 +381,7 @@ paths:
           description: Member not found for the provided id
         '500':
           description: Unexpected error
-     delete:
+    delete:
       summary: Delete an existing member
       description: Delete an existing member
       operationId: delete_member
@@ -517,7 +517,7 @@ paths:
           description: Recording not found for the provided id
         '500':
           description: Unexpected error
-     delete:
+    delete:
       summary: Delete an existing recording
       description: Delete an existing recording
       operationId: delete_recording
@@ -652,7 +652,7 @@ paths:
           description: Concert not found for the provided id
         '500':
           description: Unexpected error
-     delete:
+    delete:
       summary: Delete an existing band composition
       description: Delete an existing band composition
       operationId: delete_band_composition
@@ -761,7 +761,7 @@ paths:
           description: Concert not found for the provided id
         '500':
           description: Unexpected error
-     delete:
+    delete:
       summary: Delete an existing setlist
       description: Delete an existing setlist
       operationId: delete_setlist
