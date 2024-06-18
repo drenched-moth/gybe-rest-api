@@ -919,7 +919,7 @@ components:
           type: integer
         name:
           type: string
-     NewMember:
+    NewMember:
       type: object
       required:
         - name
