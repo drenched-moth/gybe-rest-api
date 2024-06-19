@@ -1,0 +1,979 @@
+openapi: '3.0.0'
+info:
+  version: '0.1.0'
+  title: 'gybe-rest-api'
+  description: Rest API for all data related to godspeed you ! black emperor concerts and concerts recordings
+  contact:
+    name: Lucas Donati
+    email: lucas.donati@etu.unige.ch
+
+servers:
+  - url: http://localhost:8080/v1
+    description: local server
+
+tags:
+  - name: Concerts
+  - name: Recordings
+  - name: Songs
+  - name: Members
+  - name: BandCompositions
+  - name: Setlists
+
+paths:
+  /concerts:
+    get:
+      summary: Get concerts
+      description: Get concerts
+      operationId: get_concerts
+      tags:
+        - Concerts
+      parameters:
+        - name: date
+          in: query
+          description: The specific date of the concert (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+        - name: year
+          in: query
+          description: Get concerts in the specified year
+          schema:
+            type: integer
+        - name: beforeYear
+          in: query
+          description: Get concerts before specified year
+          schema:
+            type: integer
+        - name: afterYear
+          in: query
+          description: Get concerts after specified year
+          schema:
+            type: integer
+        - name: venue
+          in: query
+          description: Get concerts that took place at specified venue
+          schema:
+            type: string
+        - name: city
+          in: query
+          description: Get concerts that took place at specified city
+          schema:
+            type: string
+        - name: state
+          in: query
+          description: Get concerts that took place in specified state
+          schema: 
+            type: string
+        - name: country
+          in: query
+          description: Get concerts that took place in specified country
+          schema:
+            type: string
+      responses:
+        '200':
+          description: All concerts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Concert'
+        '400':
+          description: Invalid query parameter
+        '500':
+          description: Unexpected error
+    post:
+      summary: Create a new concert
+      description: Create a new concert
+      operationId: create_concert
+      tags:
+        - Concerts
+      requestBody:
+        description: A new concert object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewConcert'
+      responses:
+        '201':
+          description: Concert created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Concert'
+        '400':
+          description: Invalid input
+        '500':
+          description: Unexpected error
+  /concerts/{concert_id}:
+    get:
+      summary: Get a specific concert
+      description: Get a specific concert
+      operationId: get_concert_by_id
+      tags:
+        - Concerts
+      parameters:
+        - name: concert_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: The id specified concert_id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Concert'
+        '404':
+          description: No concert found for the provided 'concert_id'
+        '500':
+          description: Unexpected error
+    put:
+      summary: Update an existing concert
+      description: Update an existing concert
+      operationId: update_concert
+      tags:
+        - Concerts
+      parameters:
+        - name: concert_id
+          in: path
+          required: true
+          description: ID of  the concert to update
+          schema:
+            type: integer
+      requestBody:
+        description: Updated concert object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewConcert'
+      responses:
+        '200':
+          description: Concert updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Concert'
+        '400':
+          description: Invalid input
+        '404':
+          description: Concert not found for the provided id
+        '500':
+          description: Unexpected error
+    delete:
+      summary: Delete an existing concert
+      description: Delete an existing concert
+      operationId: delete_concert
+      tags:
+        - Concerts
+      parameters:
+        - name: concert_id
+          in: path
+          required: true
+          description: ID of the concert to delete
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Concert deleted successfully
+        '404':
+          description: Concert not found
+        '500':
+          description: Unexpected error
+  /songs:
+    get:
+      summary: Get songs
+      description: Get songs
+      operationId: get_songs
+      tags:
+        - Songs
+      parameters:
+        - name: matches
+          in: query
+          description: Aliases of given song name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: All songs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Song'
+        '400':
+          description: Invalid query parameter
+    post:
+      summary: Create a new song
+      description: Create a new song
+      operationId: insert_song
+      tags:
+        - Songs
+      requestBody:
+        description: A new song object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewSong'
+      responses:
+        '201':
+          description: Song created Succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Song'
+        '400':
+          description: Invalid input
+        '500':
+          description: Unexpected error
+
+  /songs/{song_id}:
+    get:
+      summary: Get names for a specific song
+      description: Get names for a specific song
+      operationId: get_song_by_id
+      tags:
+        - Songs
+      parameters:
+        - name: song_id
+          description: Song ID
+          in: path 
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Names of the song
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Song'
+        '404':
+          description: Song not found
+    post:
+      summary: Add aliases to a specific song
+      description: Add aliases to a specific song
+      operationId: insert_aliases
+      tags:
+        - Songs
+      parameters:
+        - name: song_id
+          description: Song ID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: New aliases object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewSong'
+      responses:
+        '201':
+          description: Aliases added succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Song'
+        '400':
+          description: Invalid input
+        '500':
+          description: Unexpected error
+    delete:
+      summary: Delete an existing song
+      description: Delete an existing song
+      operationId: delete_song
+      tags:
+        - Songs
+      parameters:
+        - name: song_id
+          in: path
+          required: true
+          description: ID of the song to delete
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Song deleted successfully
+        '404':
+          description: Song not found
+        '500':
+          description: Unexpected error
+
+  /members:
+    get:
+      summary: Get all members
+      description: Get all members
+      operationId: get_members
+      tags:
+        - Members
+      responses:
+        '200':
+          description: Members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Member'
+    post:
+      summary: Add new member
+      description: Add new member
+      operationId: insert_member
+      tags:
+        - Members
+      requestBody:
+        description: New member object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewMember'
+      responses:
+        '201':
+          description: New member created succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+        '400':
+          description: Invalid input
+        '500':
+          description: Unexpected error
+  /members/{member_id}:
+    put:
+      summary: Update an existing member
+      description: Update an existing member
+      operationId: update_member
+      tags:
+        - Members
+      parameters:
+        - name: member_id
+          in: path
+          required: true
+          description: ID of the member to update
+          schema:
+            type: integer
+      requestBody:
+        description: Updated member object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewMember'
+      responses:
+        '200':
+          description: Member updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+        '400':
+          description: Invalid input
+        '404':
+          description: Member not found for the provided id
+        '500':
+          description: Unexpected error
+    delete:
+      summary: Delete an existing member
+      description: Delete an existing member
+      operationId: delete_member
+      tags:
+        - Members
+      parameters:
+        - name: member_id
+          in: path
+          required: true
+          description: ID of the member to delete
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Member deleted successfully
+        '404':
+          description: Member not found
+        '500':
+          description: Unexpected error
+ 
+  /recordings:
+    get:
+      summary: Get all recordings
+      description: Get all recordings
+      operationId: get_recordings
+      tags:
+        - Recordings
+      parameters:
+        - name: date
+          in: query
+          description: Get recordings at specified date
+          schema:
+            type: string
+            format: date
+        - name: year
+          in: query
+          description: Get recordings at specifed afterYear
+          schema:
+            type: integer
+        - name: beforeYear
+          in: query
+          description: Get recordings before specified year
+          schema:
+            type: integer
+        - name: afterYear
+          in: query
+          description: Get recordings after specified year
+          schema:
+            type: integer
+        - name: venue
+          in: query
+          description: Get recordings that took place at specified venue
+          schema:
+            type: string
+        - name: city
+          in: query
+          description: Get recordings that took place at specified city
+          schema:
+            type: string
+        - name: state
+          in: query
+          description: Get recordings that took place in specified state
+          schema: 
+            type: string
+        - name: country
+          in: query
+          description: Get recordings that took place in specified country
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Recordings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recording'
+        '400':
+          description: Invalid query parameter
+  /recordings/{recording_id}:
+    get:
+      summary: Get a specific recording
+      description: Get a specific recording
+      operationId: get_recordings_by_id
+      tags:
+        - Recordings
+      parameters:
+        - name: recording_id
+          in: path 
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Specified recording_id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recording'
+        '404':
+          description: No recordings found for the provided 'recording_id'
+    put:
+      summary: Update a recording
+      description: Update a recording
+      operationId: update_recording
+      tags:
+        - Recordings
+      parameters:
+        - name: recording_id
+          in: path
+          required: true
+          description: ID of the recording to update
+          schema:
+            type: integer
+      requestBody:
+        description: Updated recording object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewRecording'
+      responses:
+        '200':
+          description: Recording updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recording'
+        '400':
+          description: Invalid input
+        '404':
+          description: Recording not found for the provided id
+        '500':
+          description: Unexpected error
+    delete:
+      summary: Delete an existing recording
+      description: Delete an existing recording
+      operationId: delete_recording
+      tags:
+        - Recordings
+      parameters:
+        - name: recording_id
+          in: path
+          required: true
+          description: ID of the recording to delete
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Recording deleted successfully
+        '404':
+          description: Recording not found
+        '500':
+          description: Unexpected error
+
+  /concerts/{concert_id}/recordings:
+    get:
+      summary: Get recordings of a specific concert
+      description: Get recordings of a specific concert
+      operationId: get_recordings_by_concert_id
+      tags:
+        - Recordings
+      parameters:
+        - name: concert_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Recordings of specified concert
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recording'
+        '404':
+          description: No concert found for the provided 'concert_id'
+    post:
+      summary: Create a recording for a concert
+      description: Create a recording for a concert
+      operationId: insert_recording
+      tags:
+        - Recordings
+      parameters:
+        - name: concert_id
+          in: path
+          required: true
+          description: ID of the recorded concert
+          schema:
+            type: integer
+      requestBody:
+        description:  recording object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewRecording'
+      responses:
+        '201':
+          description: Recording created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recording'
+        '400':
+          description: Invalid input
+        '404':
+          description: Concert not found for the provided id
+        '500':
+          description: Unexpected error
+
+  /concerts/{concert_id}/members:
+    get:
+      summary: Get the band composition at a specific concert
+      description: Get the band composition at a specific concert
+      operationId: get_members_by_concert_id
+      tags:
+        - BandCompositions
+      parameters:
+        - name: concert_id
+          in: path
+          required: true
+          description: ID of the concert
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Band composition of specified concert
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BandComposition'
+        '404':
+          description: No concert found for the provided 'concert_id'
+    post:
+      summary: Create the band composition for a concert
+      description: Create the band composition for a concert
+      operationId: insert_band_composition
+      tags:
+        - BandCompositions
+      parameters:
+        - name: concert_id
+          in: path
+          required: true
+          description: ID of the concert
+          schema:
+            type: integer
+      requestBody:
+        description: band composition object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BandComposition'
+      responses:
+        '201':
+          description: Band composition created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BandComposition'
+        '400':
+          description: Invalid input
+        '404':
+          description: Concert not found for the provided id
+        '500':
+          description: Unexpected error
+    delete:
+      summary: Delete an existing band composition
+      description: Delete an existing band composition
+      operationId: delete_band_composition
+      tags:
+        - BandCompositions
+      parameters:
+        - name: concert_id
+          in: path
+          required: true
+          description: ID of the concert
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Band composition deleted successfully
+        '404':
+          description: Band composition not found
+        '500':
+          description: Unexpected error
+
+  /concerts/{concert_id}/songs:
+    get:
+      summary: Get played songs at a specific concert
+      description: Get played songs at a specific concert
+      operationId: get_songs_by_concert_id
+      tags:
+        - Setlists
+      parameters:
+        - name: concert_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Songs played at specified concert
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Setlist'
+        '404':
+          description: No concert found for the provided 'concert_id'
+    post:
+      summary: Create a setlist for a concert
+      description: Create a setlist for a concert
+      operationId: insert_setlist
+      tags:
+        - Setlists
+      parameters:
+        - name: concert_id
+          in: path
+          required: true
+          description: ID of the concert
+          schema:
+            type: integer
+      requestBody:
+        description: setlist object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Setlist'
+      responses:
+        '201':
+          description: Setlist created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Setlist'
+        '400':
+          description: Invalid input
+        '404':
+          description: Concert not found for the provided id
+        '500':
+          description: Unexpected error
+    put:
+      summary: Update a setlist for a concert
+      description: Update a setlist for a concert
+      operationId: update_setlist
+      tags:
+        - Setlists
+      parameters:
+        - name: concert_id
+          in: path
+          required: true
+          description: ID of the concert
+          schema:
+            type: integer
+      requestBody:
+        description: Updated setlist object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Setlist'
+      responses:
+        '200':
+          description: Setlist updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Setlist'
+        '400':
+          description: Invalid input
+        '404':
+          description: Concert not found for the provided id
+        '500':
+          description: Unexpected error
+    delete:
+      summary: Delete an existing setlist
+      description: Delete an existing setlist
+      operationId: delete_setlist
+      tags:
+        - Setlists
+      parameters:
+        - name: concert_id
+          in: path
+          required: true
+          description: ID of the concert
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Setlist deleted successfully
+        '404':
+          description: Setlist not found
+        '500':
+          description: Unexpected error
+
+  /songs/{song_id}/recordings:
+    get:
+      summary: Get recordings where specified song can be heard
+      description: Get recordings where specified song can be heard
+      operationId: get_recordings_by_song_id
+      tags:
+        - Recordings
+      parameters:
+        - name: song_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Recordings where specifed song appears
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recording'
+        '404':
+          description: No song found for the provided 'song_id'
+
+components:
+  schemas:
+    Concert:
+      type: object
+      required:
+        - id
+        - date
+        - venue
+        - city
+        - country
+      properties:
+        id:
+          type: integer
+        date:
+          type: string
+          format: date
+        venue:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        extra_info:
+          type: string
+        notes:
+          type: string
+        acknowledgments:
+          type: string
+    NewConcert:
+      type: object
+      required:
+        - date
+        - venue
+        - city
+        - country
+      properties:
+        date:
+          type: string
+          format: date
+        venue:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        extra_info:
+          type: string
+        notes:
+          type: string
+        acknowledgments:
+          type: string
+
+    Song:
+      type: object
+      required:
+        - id
+        - names
+      properties:
+        id:
+          type: integer
+        names:
+          type: array
+          items:
+            type: string
+    NewSong:
+      type: object
+      required:
+        - names
+      properties:
+        names:
+          type: array
+          items:
+            type: string
+            
+    SongPlayed:
+      type: object
+      required:
+        - song_id
+        - concert_id
+        - order
+      properties:
+        song_id:
+          type: integer
+        concert_id:
+          type: integer
+        order:
+          type: integer
+
+    Setlist:
+      type: object
+      required:
+        - songs
+      properties:
+        songs:
+          type: array
+          items:
+            $ref: '#/components/schemas/SongPlayed'
+
+    Member:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    NewMember:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+
+    BandComposition:
+      type: object
+      required:
+        - members
+      properties:
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/Member'
+
+    Recording:
+      type: object
+      required:
+        - recording_id
+        - concert_id
+      properties:
+        recording_id:
+          type: integer
+        concert_id:
+          type: integer
+        duration:
+          type: integer
+        source_info:
+          type: string
+        url:
+          type: string
+    NewRecording:
+      type: object
+      required:
+        - concert_id
+      properties:
+        concert_id:
+          type: integer
+        duration:
+          type: integer
+        source_info:
+          type: string
+        url:
+          type: string
+
+
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+security:
+  - ApiKey: []
