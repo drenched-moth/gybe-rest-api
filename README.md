@@ -70,24 +70,174 @@ This project is a REST API implemented with Python-Flask, designed to manage and
 
 ### Concerts
 
-- **GET /concerts**: Retrieve a list of all concerts.
-- **GET /concerts/\<id\>**: Retrieve details of a specific concert.
-- **POST /concerts**: Add a new concert.
-- **PUT /concerts/\<id\>**: Update a concert.
-- **DELETE /concerts/\<id\>**: Delete a concert.
+- **Get all concerts**
+  - `GET /concerts`
+  - Query Parameters:
+    - `date` (string, date): Specific date of the concert (YYYY-MM-DD)
+    - `year` (integer): Year of the concerts
+    - `beforeYear` (integer): Concerts before specified year
+    - `afterYear` (integer): Concerts after specified year
+    - `venue` (string): Venue of the concerts
+    - `city` (string): City of the concerts
+    - `state` (string): State of the concerts
+    - `country` (string): Country of the concerts
 
-### Setlists
+- **Create a new concert**
+  - `POST /concerts`
+  - Request Body: New concert object
 
-- **GET /concerts/\<id\>/setlist**: Retrieve the setlist of a specific concert.
+- **Get a specific concert**
+  - `GET /concerts/{concert_id}`
+  - Path Parameter:
+    - `concert_id` (integer): ID of the concert
 
-### Band Composition
+- **Update an existing concert**
+  - `PUT /concerts/{concert_id}`
+  - Path Parameter:
+    - `concert_id` (integer): ID of the concert
+  - Request Body: Updated concert object
 
-- **GET /concerts/\<id\>/band**: Retrieve the band composition for a specific concert.
+- **Delete an existing concert**
+  - `DELETE /concerts/{concert_id}`
+  - Path Parameter:
+    - `concert_id` (integer): ID of the concert
+
+### Songs
+
+- **Get all songs**
+  - `GET /songs`
+  - Query Parameter:
+    - `matches` (string): Aliases of the song name
+
+- **Create a new song**
+  - `POST /songs`
+  - Request Body: New song object
+
+- **Get a specific song**
+  - `GET /songs/{song_id}`
+  - Path Parameter:
+    - `song_id` (integer): ID of the song
+
+- **Add aliases to a specific song**
+  - `POST /songs/{song_id}`
+  - Path Parameter:
+    - `song_id` (integer): ID of the song
+  - Request Body: New aliases object
+
+- **Delete an existing song**
+  - `DELETE /songs/{song_id}`
+  - Path Parameter:
+    - `song_id` (integer): ID of the song
+
+### Members
+
+- **Get all members**
+  - `GET /members`
+
+- **Add a new member**
+  - `POST /members`
+  - Request Body: New member object
+
+- **Update an existing member**
+  - `PUT /members/{member_id}`
+  - Path Parameter:
+    - `member_id` (integer): ID of the member
+  - Request Body: Updated member object
+
+- **Delete an existing member**
+  - `DELETE /members/{member_id}`
+  - Path Parameter:
+    - `member_id` (integer): ID of the member
 
 ### Recordings
 
-- **GET /concerts/\<id\>/recordings**: Retrieve recordings of a specific concert.
+- **Get all recordings**
+  - `GET /recordings`
+  - Query Parameters:
+    - `date` (string, date): Specific date of the recording (YYYY-MM-DD)
+    - `year` (integer): Year of the recordings
+    - `beforeYear` (integer): Recordings before specified year
+    - `afterYear` (integer): Recordings after specified year
+    - `venue` (string): Venue of the recordings
+    - `city` (string): City of the recordings
+    - `state` (string): State of the recordings
+    - `country` (string): Country of the recordings
 
+- **Get a specific recording**
+  - `GET /recordings/{recording_id}`
+  - Path Parameter:
+    - `recording_id` (integer): ID of the recording
+
+- **Update an existing recording**
+  - `PUT /recordings/{recording_id}`
+  - Path Parameter:
+    - `recording_id` (integer): ID of the recording
+  - Request Body: Updated recording object
+
+- **Delete an existing recording**
+  - `DELETE /recordings/{recording_id}`
+  - Path Parameter:
+    - `recording_id` (integer): ID of the recording
+
+- **Get recordings of a specific concert**
+  - `GET /concerts/{concert_id}/recordings`
+  - Path Parameter:
+    - `concert_id` (integer): ID of the concert
+
+- **Create a recording for a concert**
+  - `POST /concerts/{concert_id}/recordings`
+  - Path Parameter:
+    - `concert_id` (integer): ID of the concert
+  - Request Body: New recording object
+
+### Band Compositions
+
+- **Get the band composition at a specific concert**
+  - `GET /concerts/{concert_id}/members`
+  - Path Parameter:
+    - `concert_id` (integer): ID of the concert
+
+- **Create the band composition for a concert**
+  - `POST /concerts/{concert_id}/members`
+  - Path Parameter:
+    - `concert_id` (integer): ID of the concert
+  - Request Body: Band composition object
+
+- **Delete an existing band composition**
+  - `DELETE /concerts/{concert_id}/members`
+  - Path Parameter:
+    - `concert_id` (integer): ID of the concert
+
+### Setlists
+
+- **Get played songs at a specific concert**
+  - `GET /concerts/{concert_id}/songs`
+  - Path Parameter:
+    - `concert_id` (integer): ID of the concert
+
+- **Create a setlist for a concert**
+  - `POST /concerts/{concert_id}/songs`
+  - Path Parameter:
+    - `concert_id` (integer): ID of the concert
+  - Request Body: Setlist object
+
+- **Update a setlist for a concert**
+  - `PUT /concerts/{concert_id}/songs`
+  - Path Parameter:
+    - `concert_id` (integer): ID of the concert
+  - Request Body: Updated setlist object
+
+- **Delete an existing setlist**
+  - `DELETE /concerts/{concert_id}/songs`
+  - Path Parameter:
+    - `concert_id` (integer): ID of the concert
+
+### Recordings by Song
+
+- **Get recordings where a specified song can be heard**
+  - `GET /songs/{song_id}/recordings`
+  - Path Parameter:
+    - `song_id` (integer): ID of the song
 
 ## Database Schema
 
