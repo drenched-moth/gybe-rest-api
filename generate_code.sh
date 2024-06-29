@@ -1,1 +1,7 @@
-sudo docker run --rm     -v /home/toucanite/Documents/gybe-rest-api:/local openapitools/openapi-generator-cli generate     -i /local/gybe-rest-api-design.yaml     -g python-flask     -o /local/out/
+sudo docker run --rm \
+     -v "$(pwd)":/local \
+     --user $(id -u):$(id -g) \
+     openapitools/openapi-generator-cli generate \
+     -i /local/oas3.yaml \
+     -g python-flask \
+     -o /local/tmp

@@ -1,0 +1,1193 @@
+openapi: 3.0.0
+info:
+  contact:
+    email: lucas.donati@etu.unige.ch
+    name: Lucas Donati
+  description: Rest API for all data related to godspeed you ! black emperor concerts
+    and concerts recordings
+  title: gybe-rest-api
+  version: 0.1.0
+servers:
+- description: local server
+  url: http://localhost:8080/v1
+security:
+- ApiKey: []
+tags:
+- name: Concerts
+- name: Recordings
+- name: Songs
+- name: Members
+- name: BandCompositions
+- name: Setlists
+paths:
+  /concerts:
+    get:
+      description: Get concerts
+      operationId: get_concerts
+      parameters:
+      - description: The specific date of the concert (YYYY-MM-DD)
+        explode: true
+        in: query
+        name: date
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Get concerts in the specified year
+        explode: true
+        in: query
+        name: year
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Get concerts before specified year
+        explode: true
+        in: query
+        name: beforeYear
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Get concerts after specified year
+        explode: true
+        in: query
+        name: afterYear
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Get concerts that took place at specified venue
+        explode: true
+        in: query
+        name: venue
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Get concerts that took place at specified city
+        explode: true
+        in: query
+        name: city
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Get concerts that took place in specified state
+        explode: true
+        in: query
+        name: state
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Get concerts that took place in specified country
+        explode: true
+        in: query
+        name: country
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Concert'
+                type: array
+          description: All concerts
+        "400":
+          description: Invalid query parameter
+        "500":
+          description: Unexpected error
+      summary: Get concerts
+      tags:
+      - Concerts
+      x-openapi-router-controller: openapi_server.controllers.concerts_controller
+    post:
+      description: Create a new concert
+      operationId: create_concert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewConcert'
+        description: A new concert object
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Concert'
+          description: Concert created successfully
+        "400":
+          description: Invalid input
+        "500":
+          description: Unexpected error
+      summary: Create a new concert
+      tags:
+      - Concerts
+      x-openapi-router-controller: openapi_server.controllers.concerts_controller
+  /concerts/{concert_id}:
+    delete:
+      description: Delete an existing concert
+      operationId: delete_concert
+      parameters:
+      - description: ID of the concert to delete
+        explode: false
+        in: path
+        name: concert_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Concert deleted successfully
+        "404":
+          description: Concert not found
+        "500":
+          description: Unexpected error
+      summary: Delete an existing concert
+      tags:
+      - Concerts
+      x-openapi-router-controller: openapi_server.controllers.concerts_controller
+    get:
+      description: Get a specific concert
+      operationId: get_concert_by_id
+      parameters:
+      - explode: false
+        in: path
+        name: concert_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Concert'
+          description: The id specified concert_id
+        "404":
+          description: No concert found for the provided 'concert_id'
+        "500":
+          description: Unexpected error
+      summary: Get a specific concert
+      tags:
+      - Concerts
+      x-openapi-router-controller: openapi_server.controllers.concerts_controller
+    put:
+      description: Update an existing concert
+      operationId: update_concert
+      parameters:
+      - description: ID of  the concert to update
+        explode: false
+        in: path
+        name: concert_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewConcert'
+        description: Updated concert object
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Concert'
+          description: Concert updated successfully
+        "400":
+          description: Invalid input
+        "404":
+          description: Concert not found for the provided id
+        "500":
+          description: Unexpected error
+      summary: Update an existing concert
+      tags:
+      - Concerts
+      x-openapi-router-controller: openapi_server.controllers.concerts_controller
+  /concerts/{concert_id}/members:
+    delete:
+      description: Delete an existing band composition
+      operationId: delete_band_composition
+      parameters:
+      - description: ID of the concert
+        explode: false
+        in: path
+        name: concert_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Band composition deleted successfully
+        "404":
+          description: Band composition not found
+        "500":
+          description: Unexpected error
+      summary: Delete an existing band composition
+      tags:
+      - BandCompositions
+      x-openapi-router-controller: openapi_server.controllers.band_compositions_controller
+    get:
+      description: Get the band composition at a specific concert
+      operationId: get_members_by_concert_id
+      parameters:
+      - description: ID of the concert
+        explode: false
+        in: path
+        name: concert_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BandComposition'
+          description: Band composition of specified concert
+        "404":
+          description: No concert found for the provided 'concert_id'
+      summary: Get the band composition at a specific concert
+      tags:
+      - BandCompositions
+      x-openapi-router-controller: openapi_server.controllers.band_compositions_controller
+    post:
+      description: Create the band composition for a concert
+      operationId: insert_band_composition
+      parameters:
+      - description: ID of the concert
+        explode: false
+        in: path
+        name: concert_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BandComposition'
+        description: band composition object
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BandComposition'
+          description: Band composition created successfully
+        "400":
+          description: Invalid input
+        "404":
+          description: Concert not found for the provided id
+        "500":
+          description: Unexpected error
+      summary: Create the band composition for a concert
+      tags:
+      - BandCompositions
+      x-openapi-router-controller: openapi_server.controllers.band_compositions_controller
+  /concerts/{concert_id}/recordings:
+    get:
+      description: Get recordings of a specific concert
+      operationId: get_recordings_by_concert_id
+      parameters:
+      - explode: false
+        in: path
+        name: concert_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Recording'
+                type: array
+          description: Recordings of specified concert
+        "404":
+          description: No concert found for the provided 'concert_id'
+      summary: Get recordings of a specific concert
+      tags:
+      - Recordings
+      x-openapi-router-controller: openapi_server.controllers.recordings_controller
+    post:
+      description: Create a recording for a concert
+      operationId: insert_recording
+      parameters:
+      - description: ID of the recorded concert
+        explode: false
+        in: path
+        name: concert_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewRecording'
+        description: recording object
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recording'
+          description: Recording created successfully
+        "400":
+          description: Invalid input
+        "404":
+          description: Concert not found for the provided id
+        "500":
+          description: Unexpected error
+      summary: Create a recording for a concert
+      tags:
+      - Recordings
+      x-openapi-router-controller: openapi_server.controllers.recordings_controller
+  /concerts/{concert_id}/songs:
+    delete:
+      description: Delete an existing setlist
+      operationId: delete_setlist
+      parameters:
+      - description: ID of the concert
+        explode: false
+        in: path
+        name: concert_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Setlist deleted successfully
+        "404":
+          description: Setlist not found
+        "500":
+          description: Unexpected error
+      summary: Delete an existing setlist
+      tags:
+      - Setlists
+      x-openapi-router-controller: openapi_server.controllers.setlists_controller
+    get:
+      description: Get played songs at a specific concert
+      operationId: get_songs_by_concert_id
+      parameters:
+      - explode: false
+        in: path
+        name: concert_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Setlist'
+          description: Songs played at specified concert
+        "404":
+          description: No concert found for the provided 'concert_id'
+      summary: Get played songs at a specific concert
+      tags:
+      - Setlists
+      x-openapi-router-controller: openapi_server.controllers.setlists_controller
+    post:
+      description: Create a setlist for a concert
+      operationId: insert_setlist
+      parameters:
+      - description: ID of the concert
+        explode: false
+        in: path
+        name: concert_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Setlist'
+        description: setlist object
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Setlist'
+          description: Setlist created successfully
+        "400":
+          description: Invalid input
+        "404":
+          description: Concert not found for the provided id
+        "500":
+          description: Unexpected error
+      summary: Create a setlist for a concert
+      tags:
+      - Setlists
+      x-openapi-router-controller: openapi_server.controllers.setlists_controller
+    put:
+      description: Update a setlist for a concert
+      operationId: update_setlist
+      parameters:
+      - description: ID of the concert
+        explode: false
+        in: path
+        name: concert_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Setlist'
+        description: Updated setlist object
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Setlist'
+          description: Setlist updated successfully
+        "400":
+          description: Invalid input
+        "404":
+          description: Concert not found for the provided id
+        "500":
+          description: Unexpected error
+      summary: Update a setlist for a concert
+      tags:
+      - Setlists
+      x-openapi-router-controller: openapi_server.controllers.setlists_controller
+  /members:
+    get:
+      description: Get all members
+      operationId: get_members
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Member'
+                type: array
+          description: Members
+      summary: Get all members
+      tags:
+      - Members
+      x-openapi-router-controller: openapi_server.controllers.members_controller
+    post:
+      description: Add new member
+      operationId: insert_member
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewMember'
+        description: New member object
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+          description: New member created succesfully
+        "400":
+          description: Invalid input
+        "500":
+          description: Unexpected error
+      summary: Add new member
+      tags:
+      - Members
+      x-openapi-router-controller: openapi_server.controllers.members_controller
+  /members/{member_id}:
+    delete:
+      description: Delete an existing member
+      operationId: delete_member
+      parameters:
+      - description: ID of the member to delete
+        explode: false
+        in: path
+        name: member_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Member deleted successfully
+        "404":
+          description: Member not found
+        "500":
+          description: Unexpected error
+      summary: Delete an existing member
+      tags:
+      - Members
+      x-openapi-router-controller: openapi_server.controllers.members_controller
+    put:
+      description: Update an existing member
+      operationId: update_member
+      parameters:
+      - description: ID of the member to update
+        explode: false
+        in: path
+        name: member_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewMember'
+        description: Updated member object
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+          description: Member updated successfully
+        "400":
+          description: Invalid input
+        "404":
+          description: Member not found for the provided id
+        "500":
+          description: Unexpected error
+      summary: Update an existing member
+      tags:
+      - Members
+      x-openapi-router-controller: openapi_server.controllers.members_controller
+  /recordings:
+    get:
+      description: Get all recordings
+      operationId: get_recordings
+      parameters:
+      - description: Get recordings at specified date
+        explode: true
+        in: query
+        name: date
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Get recordings at specifed afterYear
+        explode: true
+        in: query
+        name: year
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Get recordings before specified year
+        explode: true
+        in: query
+        name: beforeYear
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Get recordings after specified year
+        explode: true
+        in: query
+        name: afterYear
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Get recordings that took place at specified venue
+        explode: true
+        in: query
+        name: venue
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Get recordings that took place at specified city
+        explode: true
+        in: query
+        name: city
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Get recordings that took place in specified state
+        explode: true
+        in: query
+        name: state
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Get recordings that took place in specified country
+        explode: true
+        in: query
+        name: country
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Recording'
+                type: array
+          description: Recordings
+        "400":
+          description: Invalid query parameter
+      summary: Get all recordings
+      tags:
+      - Recordings
+      x-openapi-router-controller: openapi_server.controllers.recordings_controller
+  /recordings/{recording_id}:
+    delete:
+      description: Delete an existing recording
+      operationId: delete_recording
+      parameters:
+      - description: ID of the recording to delete
+        explode: false
+        in: path
+        name: recording_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Recording deleted successfully
+        "404":
+          description: Recording not found
+        "500":
+          description: Unexpected error
+      summary: Delete an existing recording
+      tags:
+      - Recordings
+      x-openapi-router-controller: openapi_server.controllers.recordings_controller
+    get:
+      description: Get a specific recording
+      operationId: get_recordings_by_id
+      parameters:
+      - explode: false
+        in: path
+        name: recording_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recording'
+          description: Specified recording_id
+        "404":
+          description: No recordings found for the provided 'recording_id'
+      summary: Get a specific recording
+      tags:
+      - Recordings
+      x-openapi-router-controller: openapi_server.controllers.recordings_controller
+    put:
+      description: Update a recording
+      operationId: update_recording
+      parameters:
+      - description: ID of the recording to update
+        explode: false
+        in: path
+        name: recording_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewRecording'
+        description: Updated recording object
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recording'
+          description: Recording updated successfully
+        "400":
+          description: Invalid input
+        "404":
+          description: Recording not found for the provided id
+        "500":
+          description: Unexpected error
+      summary: Update a recording
+      tags:
+      - Recordings
+      x-openapi-router-controller: openapi_server.controllers.recordings_controller
+  /songs:
+    get:
+      description: Get songs
+      operationId: get_songs
+      parameters:
+      - description: Aliases of given song name
+        explode: true
+        in: query
+        name: matches
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Song'
+                type: array
+          description: All songs
+        "400":
+          description: Invalid query parameter
+      summary: Get songs
+      tags:
+      - Songs
+      x-openapi-router-controller: openapi_server.controllers.songs_controller
+    post:
+      description: Create a new song
+      operationId: insert_song
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewSong'
+        description: A new song object
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Song'
+          description: Song created Succesfully
+        "400":
+          description: Invalid input
+        "500":
+          description: Unexpected error
+      summary: Create a new song
+      tags:
+      - Songs
+      x-openapi-router-controller: openapi_server.controllers.songs_controller
+  /songs/{song_id}:
+    delete:
+      description: Delete an existing song
+      operationId: delete_song
+      parameters:
+      - description: ID of the song to delete
+        explode: false
+        in: path
+        name: song_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Song deleted successfully
+        "404":
+          description: Song not found
+        "500":
+          description: Unexpected error
+      summary: Delete an existing song
+      tags:
+      - Songs
+      x-openapi-router-controller: openapi_server.controllers.songs_controller
+    get:
+      description: Get names for a specific song
+      operationId: get_song_by_id
+      parameters:
+      - description: Song ID
+        explode: false
+        in: path
+        name: song_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Song'
+                type: array
+          description: Names of the song
+        "404":
+          description: Song not found
+      summary: Get names for a specific song
+      tags:
+      - Songs
+      x-openapi-router-controller: openapi_server.controllers.songs_controller
+    post:
+      description: Add aliases to a specific song
+      operationId: insert_aliases
+      parameters:
+      - description: Song ID
+        explode: false
+        in: path
+        name: song_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewSong'
+        description: New aliases object
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Song'
+          description: Aliases added succesfully
+        "400":
+          description: Invalid input
+        "500":
+          description: Unexpected error
+      summary: Add aliases to a specific song
+      tags:
+      - Songs
+      x-openapi-router-controller: openapi_server.controllers.songs_controller
+  /songs/{song_id}/recordings:
+    get:
+      description: Get recordings where specified song can be heard
+      operationId: get_recordings_by_song_id
+      parameters:
+      - explode: false
+        in: path
+        name: song_id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Recording'
+                type: array
+          description: Recordings where specifed song appears
+        "404":
+          description: No song found for the provided 'song_id'
+      summary: Get recordings where specified song can be heard
+      tags:
+      - Recordings
+      x-openapi-router-controller: openapi_server.controllers.recordings_controller
+components:
+  schemas:
+    Concert:
+      example:
+        date: 2000-01-23
+        venue: venue
+        country: country
+        extra_info: extra_info
+        notes: notes
+        city: city
+        acknowledgments: acknowledgments
+        id: 0
+        state: state
+      properties:
+        id:
+          title: id
+          type: integer
+        date:
+          format: date
+          title: date
+          type: string
+        venue:
+          title: venue
+          type: string
+        city:
+          title: city
+          type: string
+        state:
+          title: state
+          type: string
+        country:
+          title: country
+          type: string
+        extra_info:
+          title: extra_info
+          type: string
+        notes:
+          title: notes
+          type: string
+        acknowledgments:
+          title: acknowledgments
+          type: string
+      required:
+      - city
+      - country
+      - date
+      - id
+      - venue
+      title: Concert
+      type: object
+    NewConcert:
+      example:
+        date: 2000-01-23
+        venue: venue
+        country: country
+        extra_info: extra_info
+        notes: notes
+        city: city
+        acknowledgments: acknowledgments
+        state: state
+      properties:
+        date:
+          format: date
+          title: date
+          type: string
+        venue:
+          title: venue
+          type: string
+        city:
+          title: city
+          type: string
+        state:
+          title: state
+          type: string
+        country:
+          title: country
+          type: string
+        extra_info:
+          title: extra_info
+          type: string
+        notes:
+          title: notes
+          type: string
+        acknowledgments:
+          title: acknowledgments
+          type: string
+      required:
+      - city
+      - country
+      - date
+      - venue
+      title: NewConcert
+      type: object
+    Song:
+      example:
+        names:
+        - names
+        - names
+        id: 0
+      properties:
+        id:
+          title: id
+          type: integer
+        names:
+          items:
+            type: string
+          title: names
+          type: array
+      required:
+      - id
+      - names
+      title: Song
+      type: object
+    NewSong:
+      example:
+        names:
+        - names
+        - names
+      properties:
+        names:
+          items:
+            type: string
+          title: names
+          type: array
+      required:
+      - names
+      title: NewSong
+      type: object
+    SongPlayed:
+      example:
+        song_id: 0
+        concert_id: 6
+        order: 1
+      properties:
+        song_id:
+          title: song_id
+          type: integer
+        concert_id:
+          title: concert_id
+          type: integer
+        order:
+          title: order
+          type: integer
+      required:
+      - concert_id
+      - order
+      - song_id
+      title: SongPlayed
+      type: object
+    Setlist:
+      example:
+        songs:
+        - song_id: 0
+          concert_id: 6
+          order: 1
+        - song_id: 0
+          concert_id: 6
+          order: 1
+      properties:
+        songs:
+          items:
+            $ref: '#/components/schemas/SongPlayed'
+          title: songs
+          type: array
+      required:
+      - songs
+      title: Setlist
+      type: object
+    Member:
+      example:
+        name: name
+        id: 0
+      properties:
+        id:
+          title: id
+          type: integer
+        name:
+          title: name
+          type: string
+      required:
+      - id
+      - name
+      title: Member
+      type: object
+    NewMember:
+      example:
+        name: name
+      properties:
+        name:
+          title: name
+          type: string
+      required:
+      - name
+      title: NewMember
+      type: object
+    BandComposition:
+      example:
+        members:
+        - name: name
+          id: 0
+        - name: name
+          id: 0
+      properties:
+        members:
+          items:
+            $ref: '#/components/schemas/Member'
+          title: members
+          type: array
+      required:
+      - members
+      title: BandComposition
+      type: object
+    Recording:
+      example:
+        recording_id: 0
+        duration: 1
+        concert_id: 6
+        source_info: source_info
+        url: url
+      properties:
+        recording_id:
+          title: recording_id
+          type: integer
+        concert_id:
+          title: concert_id
+          type: integer
+        duration:
+          title: duration
+          type: integer
+        source_info:
+          title: source_info
+          type: string
+        url:
+          title: url
+          type: string
+      required:
+      - concert_id
+      - recording_id
+      title: Recording
+      type: object
+    NewRecording:
+      example:
+        duration: 6
+        concert_id: 0
+        source_info: source_info
+        url: url
+      properties:
+        concert_id:
+          title: concert_id
+          type: integer
+        duration:
+          title: duration
+          type: integer
+        source_info:
+          title: source_info
+          type: string
+        url:
+          title: url
+          type: string
+      required:
+      - concert_id
+      title: NewRecording
+      type: object
+  securitySchemes:
+    ApiKey:
+      in: header
+      name: X-Api-Key
+      type: apiKey
+      x-apikeyInfoFunc: openapi_server.controllers.security_controller.info_from_ApiKey
