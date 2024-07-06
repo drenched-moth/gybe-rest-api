@@ -1,9 +1,9 @@
 from typing import Optional
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Integer, String
-from sqlalchemy import ForeignKey
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import Integer, String, or_
+from sqlalchemy import Column, Table, ForeignKey
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 class Base(DeclarativeBase):
     pass
@@ -15,10 +15,22 @@ db = SQLAlchemy(model_class=Base)
 
 db.init_app(app)
 
+# class BandComposition(Base):
+#     __tablename__ = 'BandComposition'
+
+#     memberID: Mapped[int] = mapped_column(ForeignKey("Member.memberID"), primary_key=True)
+#     concertID: Mapped[int] = mapped_column(ForeignKey("Concert.concertID"), primary_key=True)
+band_composition = Table(
+    "BandComposition",
+    Base.metadata,
+    Column("memberID", ForeignKey("Member.memberID"), primary_key=True),
+    Column("concertID", ForeignKey("Concert.concertID"), primary_key=True),
+)
+
 class Concert(Base):
     __tablename__ = 'Concert'
 
-    concertID: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    concertID: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     date_concert: Mapped[str] = mapped_column(String(20))
     venueName: Mapped[str] = mapped_column(String(255))
     city: Mapped[str] = mapped_column(String(255))
@@ -27,30 +39,33 @@ class Concert(Base):
     extraInfo: Mapped[Optional[str]] = mapped_column(String(255))
     notes: Mapped[Optional[str]] = mapped_column(String(1000))
     acknowledgments: Mapped[Optional[str]] = mapped_column(String(255))
-    # still need to understand how to declare the following 'foreign keys' or wtv
-    #recordings = db.relationship('Recording', backref='concert', lazy=True)
-    #band_compositions = db.relationship('BandComposition', backref='concert', lazy=True)
+
+    setlist: Mapped[List[SongPlayed]] = relationship(back_populates="concert")
+    recordings: Mapped[List["Recording"]] = relationship(back_populates="concert")
+    members: Mapped[List[Member]] = relationship(
+        secondary=band_composition, back_populates="concerts"
+    )
 
 class Recording(Base):
-    __tablename__ = 'Recordings'
+    __tablename__ = 'Recording'
 
-    recID: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    recID: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     concertID: Mapped[int] = mapped_column(ForeignKey("Concert.concertID"))
     duration: Mapped[Optional[int]]
     sourceInfo: Mapped[Optional[str]] = mapped_column(String(255))
     url: Mapped[Optional[str]] = mapped_column(String(255))
 
+    concert: Mapped["Concert"] = relationship(back_populates="recordings")
+
 class Member(Base):
     __tablename__ = 'Member'
 
-    memberID: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    memberID: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(100))
 
-class BandComposition(Base):
-    __tablename__ = 'BandComposition'
-
-    memberID: Mapped[int] = mapped_column(ForeignKey("Member.memberID"), primary_key=True)
-    concertID: Mapped[int] = mapped_column(ForeignKey("Concert.concertID"), primary_key=True)
+    concerts: Mapped[List[Concert]] = relationship(
+        secondary=band_composition, back_populates="members"
+    )
 
 class SongName(Base):
     __tablename__ = 'SongName'
@@ -65,6 +80,8 @@ class SongPlayed(Base):
     songID: Mapped[int] = mapped_column(primary_key=True)
     concertID: Mapped[int] = mapped_column(ForeignKey("Concert.concertID"), primary_key=True)
     orderSong: Mapped[int] = mapped_column(primary_key=True)
+
+    concert: Mapped[Concert] = relationship(back_populates="setlist")
 
 with app.app_context():
     db.create_all()
@@ -174,6 +191,58 @@ band_compo_requests = ["insert into BandComposition(memberID, concertID) select 
                        "insert into BandComposition(memberID, concertID) select {}, concertID from Concert where date_concert = '1997-03-15'"]
 
 # TODO: finish the ORM inserting for data regarding members and band composition
+for concert in db.session.scalars(db.select(Concert)):
+    concert.members.append(Member(name="Efrim Menuck"))
+    concert.members.append(Member(name="Mauro Pezzente"))
+
+for concert in db.session.scalars(db.select(Concert).where(Concert.date_concert > '1997-01-01')):
+    concert.members.append(Member(name="David Bryant"))
+    concert.members.append(Member(name="Thierry Amar"))
+    concert.members.append(Member(name="Aidan Girt"))
+
+for concert in db.session.scalars(db.select(Concert).where(or_(Concert.date_concert < '1999-01-01', Concert.date_concert > '2010-01-01'))):
+    concert.members.append(Member(name="Mike Moya"))
+
+for concert in db.session.scalars(db.select(Concert).where(Concert.date_concert > '1999-01-01', Concert.date_concert < '2004-01-01')):
+    concert.members.append(Member(name="Roger Tellier-Craig"))
+
+for concert in db.session.scalars(db.select(Concert).where(Concert.date_concert > '1999-01-01')):
+    concert.members.append(Member(name="Sophie Trudeau"))
+
+for concert in db.session.scalars(db.select(Concert).where(Concert.date_concert > '1997-01-01', Concert.date_concert < '2012-01-01')):
+    concert.members.append(Member(name="Bruce Cawdron"))
+
+for concert in db.session.scalars(db.select(Concert).where(Concert.date_concert > '2012-01-01')):
+    concert.members.append(Member(name="Timothy Herzog"))
+
+for concert in db.session.scalars(db.select(Concert).where(Concert.date_concert > '1997-01-01', Concert.date_concert < '2004-01-01')):
+    concert.members.append(Member(name="Norsola Johnson"))
+
+for concert in db.session.scalars(db.select(Concert).where(Concert.date_concert > '1995-01-01', Concert.date_concert < '1998-01-01')):
+    concert.members.append(Member(name="Thea Pratt"))
+
+for concert in db.session.scalars(db.select(Concert).where(Concert.date_concert < '2000-01-01')):
+    concert.members.append(Member(name="Mark Littlefair"))
+
+for concert in db.session.scalars(db.select(Concert).where(Concert.date_concert > '2000-01-01', Concert.date_concert < '2004-01-01')):
+    concert.members.append(Member(name="Fluffy Erskine"))
+
+for concert in db.session.scalars(db.select(Concert).where(Concert.date_concert < '2010-01-01')):
+    concert.members.append(Member(name="Karl Lemieux"))
+
+for concert in db.session.scalars(db.select(Concert).where(Concert.date_concert < '2015-01-01')):
+    concert.members.append(Member(name="Philippe Leonard"))
+
+for concert in db.session.scalars(db.select(Concert).where(Concert.date_concert > '1997-01-01', Concert.date_concert < '1999-01-01')):
+    concert.members.append(Member(name="Grayson Walker"))
+
+for concert in db.session.scalars(db.select(Concert).where(Concert.date_concert == '1997-03-15')):
+    concert.members.append(Member(name="Peter Harry Hill"))
+
+db.session.commit()
+
+# for i in range(len(members)):
+#     db.session.add(Member(name=members[i]))
 
 # chatgpt generated code below
 # def create_app():
