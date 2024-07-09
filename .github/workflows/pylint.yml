@@ -27,5 +27,5 @@ jobs:
         #pipenv shell
     - name: Analysing the code with pylint
       run: |
-        python setup.py 
+        python setup.py install
         pylint $(git ls-files '*.py')
