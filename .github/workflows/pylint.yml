@@ -22,7 +22,8 @@ jobs:
         pip install pipenv
         pipenv sync
         pipenv install pylint
-        pipenv sync
+        pipenv lock
+        #pipenv sync
         #pipenv shell
     - name: Analysing the code with pylint
       run: |
