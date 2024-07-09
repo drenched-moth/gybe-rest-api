@@ -99,8 +99,8 @@ song_name_added = dict()
 for key in data: # remember when iterating through dict you're really iterating through the keys
     # key = date_concert = venue
     entree = data[key]
-    ven = entree["venue"]
-    country = entree["country"]
+    # ven = entree["venue"]
+    # country = entree["country"]
 
     note = entree.get('note').replace('"', "\\\"")
     thx = entree.get('thanks').replace('"', "\\\"")
