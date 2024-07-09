@@ -22,7 +22,7 @@ jobs:
         pip install pipenv
         pipenv sync
         pipenv install pylint
-        pipenv shell
+        #pipenv shell
     - name: Analysing the code with pylint
       run: |
-        pylint $(git ls-files '*.py')
+        pipenv pylint $(git ls-files '*.py')
