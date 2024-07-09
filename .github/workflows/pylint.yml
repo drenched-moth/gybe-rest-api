@@ -19,7 +19,7 @@ jobs:
       run: |
         pip install --upgrade pip
         pip install pylint
-        pip install flask, flask_sqlalchemy, connexion
+        pip install flask flask_sqlalchemy connexion
         #python -m pip install --user tox
         #python -m tox --help
         #tox run
