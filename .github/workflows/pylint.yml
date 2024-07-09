@@ -19,6 +19,7 @@ jobs:
         python -m pip install --upgrade pip
         #pip install pylint
         pip install pipenv
+        ls
         pipenv sync
         pipenv install pylint
     - name: Analysing the code with pylint
