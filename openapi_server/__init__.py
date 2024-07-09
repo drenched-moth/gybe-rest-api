@@ -106,7 +106,7 @@ for key in data: # remember when iterating through dict you're really iterating 
     thx = entree.get('thanks').replace('"', "\\\"")
 
     new_concert = Concert(date_concert=key,
-                          venueName=entree.get("venue")
+                          venueName=entree.get("venue"),
                           country=entree.get("country"),
                           city=entree.get("city"),
                           state=entree.get("state"),
