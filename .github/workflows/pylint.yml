@@ -18,7 +18,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        #pip install pylint
+        pip install pylint
         pip install pipenv
         pipenv sync
         pipenv install pylint
@@ -27,5 +27,5 @@ jobs:
         #pipenv shell
     - name: Analysing the code with pylint
       run: |
-        pipenv shell 
+        python setup.py 
         pylint $(git ls-files '*.py')
