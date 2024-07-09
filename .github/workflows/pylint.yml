@@ -17,15 +17,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install pylint
-        pip install pipenv
-        pipenv sync
-        pipenv install pylint
-        pipenv lock
-        #pipenv sync
-        #pipenv shell
+        python -m pip install --user tox
+        python -m tox --help
     - name: Analysing the code with pylint
       run: |
-        python setup.py install
         pylint $(git ls-files '*.py')
