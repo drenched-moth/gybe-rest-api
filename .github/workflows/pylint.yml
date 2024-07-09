@@ -27,4 +27,5 @@ jobs:
         #pipenv shell
     - name: Analysing the code with pylint
       run: |
-        pipenv pylint $(git ls-files '*.py')
+        pipenv shell 
+        pylint $(git ls-files '*.py')
