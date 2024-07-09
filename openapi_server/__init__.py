@@ -1,3 +1,4 @@
+import json
 from typing import Optional
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -87,14 +88,12 @@ with app.app_context():
     db.create_all()
 
 
-import json
-
 with open("data/data.json", "r") as f:
     data = json.load(f)
 
 cpt = 1 # cpt pour SongName
 cpt_concert = 1
-song_name_added = dict()
+song_name_added = {} #dict()
 
 for key in data: # remember when iterating through dict you're really iterating through the keys
     # key = date_concert = venue
@@ -159,7 +158,7 @@ for elem in data:
 
 db.session.commit()
 
-sl = dict()
+sl = {} #dict()
 with open("data/data-2011-04-24-soir.json", "r") as f:
     sl = json.load(f)
 
