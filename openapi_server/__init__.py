@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import json
-from typing import Optional
+from typing import List, Optional
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Integer, String, or_
@@ -10,11 +12,13 @@ class Base(DeclarativeBase):
     pass
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql:///:memory:"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite://"
 
 db = SQLAlchemy(model_class=Base)
 
 db.init_app(app)
+
+app.app_context().push()
 
 # class BandComposition(Base):
 #     __tablename__ = 'BandComposition'
@@ -42,7 +46,7 @@ class Concert(Base):
     acknowledgments: Mapped[Optional[str]] = mapped_column(String(255))
 
     setlist: Mapped[List[SongPlayed]] = relationship(back_populates="concert")
-    recordings: Mapped[List["Recording"]] = relationship(back_populates="concert")
+    recordings: Mapped[List[Recording]] = relationship(back_populates="concert")
     members: Mapped[List[Member]] = relationship(
         secondary=band_composition, back_populates="concerts"
     )
@@ -101,8 +105,12 @@ for key in data: # remember when iterating through dict you're really iterating 
     # ven = entree["venue"]
     # country = entree["country"]
 
-    note = entree.get('note').replace('"', "\\\"")
-    thx = entree.get('thanks').replace('"', "\\\"")
+    note = entree.get('note')
+    if note is not None:
+        note = note.replace('"', "\\\"")
+    thx = entree.get('thanks')
+    if thx is not None:
+        thx = thx.replace('"', "\\\"")
 
     new_concert = Concert(date_concert=key,
                           venueName=entree.get("venue"),
@@ -149,9 +157,20 @@ for elem in data:
     else:
         dur = None
 
-    new_recording = Recording(concertID=db.session.execute(db.select(Concert.concertID).where(Concert.date_concert == elem["Date"])).scalar_one(),
+    # TODO find out why this date is broken
+    if elem["Date"] == '1998-11-26':
+        continue
+    print(elem["Date"])
+    stmt = db.select(Concert.concertID).where(Concert.date_concert == elem["Date"])
+    concertID = db.session.scalars(stmt).first()
+    
+    sourceInfo = elem["Source Info"]
+    if sourceInfo is not None :
+        sourceInfo = sourceInfo.replace('"', '\\"')
+
+    new_recording = Recording(concertID=concertID,
                               duration=dur,
-                              sourceInfo=elem['Source Info'].replace('"', '\\"'),
+                              sourceInfo=sourceInfo,
                               url=elem.get("URL"))
 
     db.session.add(new_recording)
@@ -189,7 +208,6 @@ band_compo_requests = ["insert into BandComposition(memberID, concertID) select 
                        "insert into BandComposition(memberID, concertID) select {}, concertID from Concert where date_concert > '1997-01-01' and date_concert < '1999-01-01'",
                        "insert into BandComposition(memberID, concertID) select {}, concertID from Concert where date_concert = '1997-03-15'"]
 
-# TODO: finish the ORM inserting for data regarding members and band composition
 for concert in db.session.scalars(db.select(Concert)):
     concert.members.append(Member(name="Efrim Menuck"))
     concert.members.append(Member(name="Mauro Pezzente"))
